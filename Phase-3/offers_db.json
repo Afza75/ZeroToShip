@@ -3,7 +3,23 @@
     "offer_id": 1,
     "post_id": 1,
     "proposer_id": 1,
-    "offered_item_details": "Wireless headphones + charger",
+    "offered_item_details": "I'll add my phone charger too",
     "turn_holder_id": 1
+  },
+  {
+    "offer_id": 2,
+    "post_id": 2,
+    "proposer_id": 1,
+    "offered_item_details": "I'll trade it if you add a helmet too",
+    "turn_holder_id": 1,
+    "status": "Declined"
+  },
+  {
+    "offer_id": 3,
+    "post_id": 2,
+    "proposer_id": 3,
+    "offered_item_details": "I'll trade my roller skates for it",
+    "turn_holder_id": 2,
+    "status": "Accepted"
   }
 ]

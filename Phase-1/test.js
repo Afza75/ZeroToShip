@@ -20,8 +20,8 @@ fs.writeFileSync('tradepost_db.json', JSON.stringify(dbData, null, 2));
 console.log("\nSaved to tradepost_db.json");
 
 const rawData = fs.readFileSync('tradepost_db.json');
-
 const parsedData = JSON.parse(rawData);
+
 
 const rebuiltPost = Post.fromDict(parsedData.posts[0]);
 const rebuiltOffer = Offer.fromDict(parsedData.offers[0]);
