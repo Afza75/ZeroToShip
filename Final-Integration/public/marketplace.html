@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradePost — Marketplace</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>TradePost</h1>
+    <nav>
+      <a href="marketplace.html" class="active">Marketplace</a>
+      <a href="dashboard.html">My Negotiations</a>
+    </nav>
+  </header>
+
+  <main class="marketplace">
+    <div class="marketplace-header">
+      <h2>Browse Listings</h2>
+
+      <!-- Unhooked form selectors: visual only, no real filtering logic yet -->
+      <div class="filters">
+        <select disabled>
+          <option>Filter by status: All</option>
+          <option>Open</option>
+          <option>Traded</option>
+        </select>
+        <input type="text" placeholder="Search items..." disabled>
+      </div>
+    </div>
+
+    <!-- Card grid -->
+    <div class="post-grid">
+
+      <div class="post-card">
+        <div class="post-image">🎸</div>
+        <span class="badge badge-open">Open</span>
+        <h3>Guitar for trade</h3>
+        <p>Acoustic, good condition. Looking for something interesting in return.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+      <div class="post-card">
+        <div class="post-image">🚲</div>
+        <span class="badge badge-open">Open</span>
+        <h3>Bicycle for trade</h3>
+        <p>Mountain bike, barely used. Great for city commuting.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+      <div class="post-card">
+        <div class="post-image">📷</div>
+        <span class="badge badge-traded">Traded</span>
+        <h3>Vintage Camera</h3>
+        <p>Fully functional film camera from the 90s.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+      <div class="post-card">
+        <div class="post-image">🎧</div>
+        <span class="badge badge-open">Open</span>
+        <h3>Wireless Headphones</h3>
+        <p>Noise-cancelling, includes original case and charger.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+      <div class="post-card">
+        <div class="post-image">📚</div>
+        <span class="badge badge-open">Open</span>
+        <h3>Programming Book Bundle</h3>
+        <p>Set of 5 books covering web development fundamentals.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+      <div class="post-card">
+        <div class="post-image">⌚</div>
+        <span class="badge badge-traded">Traded</span>
+        <h3>Smart Watch</h3>
+        <p>One year old, minor scratches, works perfectly.</p>
+        <button disabled>Make an Offer</button>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>
