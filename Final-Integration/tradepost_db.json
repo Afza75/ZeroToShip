@@ -1,0 +1,16 @@
+[
+  {
+    "post_id": 1,
+    "title": "Guitar for trade",
+    "description": "Acoustic, good condition",
+    "owner_id": 1,
+    "status": "Open"
+  },
+  {
+    "post_id": 2,
+    "title": "Bicycle for trade",
+    "description": "Mountain bike, barely used",
+    "owner_id": 2,
+    "status": "Traded"
+  }
+]
