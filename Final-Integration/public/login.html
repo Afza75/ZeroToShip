@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradePost — Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>TradePost</h1>
+    <nav><a href="marketplace.html">Marketplace</a></nav>
+  </header>
+
+  <main class="auth-wrapper">
+  <h2>Login</h2>
+  <div class="auth-card">
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button class="btn-primary" onclick="doLogin()">Login</button>
+    <button class="btn-secondary" onclick="doRegister()">Register instead</button>
+    <p class="auth-message" id="message"></p>
+  </div>
+</main>
+
+  <script src="js/auth-client.js"></script>
+  <script>
+    async function doLogin() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        saveSession(data.token, username);
+        window.location.href = 'marketplace.html'; // redirect after successful login (PRG-style)
+      } else {
+        document.getElementById('message').innerText = data.error || 'Login failed';
+      }
+    }
+
+    async function doRegister() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById('message').style.color = '#15803d';
+        document.getElementById('message').innerText = 'Registered! Now click Login.';
+      } else {
+        document.getElementById('message').innerText = data.error || 'Registration failed';
+      }
+    }
+  </script>
+</body>
+</html>

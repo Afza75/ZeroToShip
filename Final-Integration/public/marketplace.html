@@ -12,14 +12,13 @@
     <nav>
       <a href="marketplace.html" class="active">Marketplace</a>
       <a href="dashboard.html">My Negotiations</a>
+      <span id="auth-status" style="margin-left:20px;"></span>
     </nav>
   </header>
 
   <main class="marketplace">
     <div class="marketplace-header">
       <h2>Browse Listings</h2>
-
-      <!-- Unhooked form selectors: visual only, no real filtering logic yet -->
       <div class="filters">
         <select disabled>
           <option>Filter by status: All</option>
@@ -30,59 +29,75 @@
       </div>
     </div>
 
-    <!-- Card grid -->
-    <div class="post-grid">
-
-      <div class="post-card">
-        <div class="post-image">🎸</div>
-        <span class="badge badge-open">Open</span>
-        <h3>Guitar for trade</h3>
-        <p>Acoustic, good condition. Looking for something interesting in return.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
-      <div class="post-card">
-        <div class="post-image">🚲</div>
-        <span class="badge badge-open">Open</span>
-        <h3>Bicycle for trade</h3>
-        <p>Mountain bike, barely used. Great for city commuting.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
-      <div class="post-card">
-        <div class="post-image">📷</div>
-        <span class="badge badge-traded">Traded</span>
-        <h3>Vintage Camera</h3>
-        <p>Fully functional film camera from the 90s.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
-      <div class="post-card">
-        <div class="post-image">🎧</div>
-        <span class="badge badge-open">Open</span>
-        <h3>Wireless Headphones</h3>
-        <p>Noise-cancelling, includes original case and charger.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
-      <div class="post-card">
-        <div class="post-image">📚</div>
-        <span class="badge badge-open">Open</span>
-        <h3>Programming Book Bundle</h3>
-        <p>Set of 5 books covering web development fundamentals.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
-      <div class="post-card">
-        <div class="post-image">⌚</div>
-        <span class="badge badge-traded">Traded</span>
-        <h3>Smart Watch</h3>
-        <p>One year old, minor scratches, works perfectly.</p>
-        <button disabled>Make an Offer</button>
-      </div>
-
+    <!-- Real cards get inserted here by JavaScript -->
+    <div class="post-grid" id="post-grid">
+      <p>Loading listings...</p>
     </div>
   </main>
 
+  <script src="js/auth-client.js"></script>
+  <script>
+    updateNavAuthStatus();
+
+    function loadPosts() {
+      fetch('/api/posts')
+        .then(res => res.json())
+        .then(posts => {
+          const grid = document.getElementById('post-grid');
+          grid.innerHTML = '';
+
+          posts.forEach(post => {
+            const badgeClass = post.status === 'Open' ? 'badge-open' : 'badge-traded';
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            card.innerHTML = `
+              <div class="post-image">📦</div>
+              <span class="badge ${badgeClass}">${post.status}</span>
+              <h3>${post.title}</h3>
+              <p>${post.description}</p>
+              <button onclick="makeOffer(${post.post_id})" ${post.status !== 'Open' ? 'disabled' : ''}>
+                Make an Offer
+              </button>
+            `;
+            grid.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Failed to load posts:', err));
+    }
+
+    // Click handler for "Make an Offer" — this is the real, wired-up action.
+    async function makeOffer(postId) {
+      if (!getToken()) {
+        alert('Please log in first.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const details = prompt('What are you offering in exchange?');
+      if (!details) return; // user cancelled
+
+      const res = await fetch('/api/offers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ post_id: postId, offered_item_details: details })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Offer submitted!');
+        // Post/Redirect/Get pattern: after a successful POST, we refresh via a
+        // fresh GET load instead of just patching the page, avoiding stale/duplicate state.
+        window.location.reload();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+
+    loadPosts();
+  </script>
 </body>
 </html>

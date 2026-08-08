@@ -12,52 +12,104 @@
     <nav>
       <a href="marketplace.html">Marketplace</a>
       <a href="dashboard.html" class="active">My Negotiations</a>
+      <span id="auth-status" style="margin-left:20px;"></span>
     </nav>
   </header>
 
   <main class="dashboard">
     <h2>Active Negotiations</h2>
-
-    <div class="negotiation-list">
-
-      <div class="negotiation-card">
-        <div class="negotiation-info">
-          <h3>Guitar for trade</h3>
-          <p>Negotiating with: <strong>ali</strong></p>
-          <p>Offered: "I'll add my phone charger too"</p>
-        </div>
-        <span class="status-badge your-turn">Your Turn</span>
-      </div>
-
-      <div class="negotiation-card">
-        <div class="negotiation-info">
-          <h3>Bicycle for trade</h3>
-          <p>Negotiating with: <strong>noor</strong></p>
-          <p>Offered: "I'll trade my skateboard for it"</p>
-        </div>
-        <span class="status-badge waiting-peer">Waiting for Peer</span>
-      </div>
-
-      <div class="negotiation-card">
-        <div class="negotiation-info">
-          <h3>Wireless Headphones</h3>
-          <p>Negotiating with: <strong>bilal</strong></p>
-          <p>Offered: "I'll trade my roller skates for it"</p>
-        </div>
-        <span class="status-badge your-turn">Your Turn</span>
-      </div>
-
-      <div class="negotiation-card">
-        <div class="negotiation-info">
-          <h3>Vintage Camera</h3>
-          <p>Negotiating with: <strong>sara</strong></p>
-          <p>Offered: "I'll add a lens filter as well"</p>
-        </div>
-        <span class="status-badge waiting-peer">Waiting for Peer</span>
-      </div>
-
+    <div class="negotiation-list" id="negotiation-list">
+      <p>Loading...</p>
     </div>
   </main>
 
+  <script src="js/auth-client.js"></script>
+  <script>
+    updateNavAuthStatus();
+    requireLogin(); // dashboard requires being logged in
+
+    function loadOffers() {
+      fetch('/api/offers', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      })
+        .then(res => res.json())
+        .then(offers => {
+          const list = document.getElementById('negotiation-list');
+          list.innerHTML = '';
+
+          if (offers.length === 0) {
+            list.innerHTML = '<p>No active negotiations yet.</p>';
+            return;
+          }
+
+          offers.forEach(offer => {
+            const card = document.createElement('div');
+            card.className = 'negotiation-card';
+
+            const badgeClass = offer.is_your_turn ? 'your-turn' : 'waiting-peer';
+            const badgeText = offer.is_your_turn ? 'Your Turn' : 'Waiting for Peer';
+
+            card.innerHTML = `
+              <div class="negotiation-info">
+                <h3>${offer.post_title}</h3>
+                <p>Status: <strong>${offer.status || 'Negotiating'}</strong></p>
+                <p>Offered: "${offer.offered_item_details}"</p>
+              </div>
+              <div class="negotiation-actions">
+  <span class="status-badge ${badgeClass}">${badgeText}</span>
+  ${offer.is_your_turn && offer.status !== 'Accepted' && offer.status !== 'Declined' ? `
+    <div class="btn-group">
+      <button class="btn-counter" onclick="counterOffer(${offer.offer_id})">Counter</button>
+      <button class="btn-accept" onclick="acceptOffer(${offer.offer_id})">Accept</button>
+    </div>
+  ` : ''}
+</div>
+            `;
+            list.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Failed to load offers:', err));
+    }
+
+    async function counterOffer(offerId) {
+      const details = prompt('Enter your counter-offer terms:');
+      if (!details) return;
+
+      const res = await fetch(`/api/offers/${offerId}/counter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ offered_item_details: details })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        window.location.reload(); // PRG-style refresh after successful write
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+
+    async function acceptOffer(offerId) {
+      if (!confirm('Accept this offer? This will decline all rival offers on this post.')) return;
+
+      const res = await fetch(`/api/offers/${offerId}/accept`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Trade accepted!');
+        window.location.reload();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    }
+
+    loadOffers();
+  </script>
 </body>
 </html>
